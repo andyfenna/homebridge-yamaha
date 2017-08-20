@@ -379,10 +379,7 @@ YamahaInput.prototype = {
                         callback(false, false);
                     }
 
-                }.bind(this), function(error) {
-                    this.log('Error: %s', error);
-                    callback(error);
-                });
+                }.bind(this));
 
             }.bind(this))
             .on('set', function(powerOn, callback) {

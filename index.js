@@ -26,7 +26,8 @@ var mdns = require('mdns');
 //workaround for raspberry pi
 var sequence = [
     mdns.rst.DNSServiceResolve(),
-    'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({
+    'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : 
+    mdns.rst.getaddrinfo({
         families: [4]
     }),
     mdns.rst.makeAddressesUnique()
@@ -379,6 +380,7 @@ YamahaInput.prototype = {
                     }
 
                 }.bind(this), function(error) {
+                    this.log('Error: %s', error);
                     callback(error);
                 });
 

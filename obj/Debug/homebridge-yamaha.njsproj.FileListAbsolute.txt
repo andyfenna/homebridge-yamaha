@@ -1,0 +1,2 @@
+C:\Git\homebridge-yamaha\obj\Debug\homebridge-yamaha.njsprojResolveAssemblyReference.cache
+C:\Git\homebridge-yamaha\bin\Microsoft.NodejsTools.WebRole.dll

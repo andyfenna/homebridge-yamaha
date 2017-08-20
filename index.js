@@ -195,19 +195,19 @@ YamahaAVRPlatform.prototype = {
                             }.bind(this));
                         }
 
-                        // Add buttons for each input
+                        //// Add buttons for each input
 
-                        if(this.setInputs) {
+                        //if(this.setInputs) {
 
-                            yamaha.getAvailableInputs().then(function(inputs) {
-                                for (var inputs in input) {
-                                    this.log("Adding input %s - %s", input, inputs[input].value, this.inputNum);
-                                    // input by number
-                                    var accessory = new YamahaInput(this.log, this.config, input, yamaha, sysConfig);
-                                    accessories.push(accessory);
-                                };
-                            }.bind(this));
-                        }
+                        //    yamaha.getAvailableInputs().then(function(inputs) {
+                        //        for (var inputs in input) {
+                        //            this.log("Adding input %s - %s", input, inputs[input].value, this.inputNum);
+                        //            // input by number
+                        //            var accessory = new YamahaInput(this.log, this.config, input, yamaha, sysConfig);
+                        //            accessories.push(accessory);
+                        //        };
+                        //    }.bind(this));
+                        //}
                     }
                     if (accessories.length >= this.expectedDevices)
                         timeoutFunction(); // We're done, call the timeout function now.

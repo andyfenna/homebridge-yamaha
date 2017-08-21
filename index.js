@@ -8,6 +8,7 @@ Configuration Sample:
             "platform": "YamahaAVR",
             "play_volume": -48,
             "setMainInputTo": "Airplay",
+            "setInputs" : true,
             "manual_addresses": {
             "Yamaha": "192.168.1.115"}
         }
@@ -191,6 +192,17 @@ YamahaAVRPlatform.prototype = {
                                 };
                             }.bind(this));
                         }
+
+                        if(this.setInputs) {
+                            yamaha.getAvailableInputs().then(function(inputs) {
+                                for (var inputs in input) {
+                                    this.log("Adding input %s - %s", input, inputs[input].value, this.inputNum);
+                                    // input by number
+                                    var accessory = new YamahaInput(this.log, this.config, input, yamaha, sysConfig);
+                                    accessories.push(accessory);
+                                };
+                            }.bind(this));
+                        }
                     }
                     if (accessories.length >= this.expectedDevices)
                         timeoutFunction(); // We're done, call the timeout function now.
@@ -306,6 +318,73 @@ YamahaSwitch.prototype = {
             yamaha.setMainInputTo("TUNER").then(function () {
                 return yamaha.selectTunerPreset(this.preset).then(function () {
                     this.log('Tuning radio to preset %s - %s', this.preset, this.name);
+                    callback(null, 1);
+                }.bind(this));
+            }.bind(this));
+
+        }.bind(this));
+        
+        return [informationService, switchService];
+    }
+};
+
+
+function YamahaInput(log, config, input, yamaha, sysConfig) {
+    this.log = log;
+    this.config = config;
+    this.yamaha = yamaha;
+    this.sysConfig = sysConfig;
+    
+    this.nameSuffix = config["name_suffix"] || " Speakers";
+    this.zone = config["zone"] || 1;
+    this.name = 'Input ' + parseInt(input).toString();
+    this.serviceName = input + this.nameSuffix;
+    this.playVolume = this.config["play_volume"];
+    this.minVolume = config["min_volume"] || -50.0;
+    this.maxVolume = config["max_volume"] || -20.0;
+    this.gapVolume = this.maxVolume - this.minVolume;
+    this.input = input;
+}
+
+YamahaInput.prototype = {
+    
+    getServices: function () {
+        var that = this;
+        var informationService = new Service.AccessoryInformation();
+        var yamaha = this.yamaha;
+        
+        informationService
+            .setCharacteristic(Characteristic.Name, this.name)
+            .setCharacteristic(Characteristic.Manufacturer, "Yamaha")
+            .setCharacteristic(Characteristic.Model, this.sysConfig.YAMAHA_AV.System[0].Config[0].Model_Name[0])
+            .setCharacteristic(Characteristic.SerialNumber, this.sysConfig.YAMAHA_AV.System[0].Config[0].System_ID[0]);
+        
+        var switchService = new Service.Switch(this.name);
+        switchService.getCharacteristic(Characteristic.On)
+            .on('get', function (callback, context) {
+            yamaha.getBasicInfo().then(function (basicInfo) {
+                debug('Is On', basicInfo.isOn()); // True
+                debug('Input', basicInfo.getCurrentInput());
+                
+                if (basicInfo.isOn() && basicInfo.getCurrentInput() == this.input) {
+                    
+                    callback(false, true);
+
+                } else {
+                    // Off
+                    callback(false, false);
+                }
+
+            }.bind(this), function (error) {
+                this.log('Error: %s', error);
+                callback(error);
+            });
+
+        }.bind(this))
+            .on('set', function (powerOn, callback) {
+            yamaha.setMainInputTo(this.input).then(function () {
+                return yamaha.setMainInputTo(this.input).then(function () {
+                    this.log('Switch input to %s', this.input);
                     callback(null, 1);
                 }.bind(this));
             }.bind(this));

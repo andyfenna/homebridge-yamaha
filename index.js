@@ -8,7 +8,7 @@ Configuration Sample:
             "platform": "YamahaAVR",
             "play_volume": -48,
             "setMainInputTo": "Airplay",
-            "setInputs" : true,
+            "add_inputs" : true,
             "manual_addresses": {
             "Yamaha": "192.168.1.115"}
         }
@@ -70,6 +70,7 @@ function YamahaAVRPlatform(log, config) {
     this.expectedDevices = config["expected_devices"] || 100;
     this.discoveryTimeout = config["discovery_timeout"] || 30;
     this.radioPresets = config["radio_presets"] || false;
+    this.addInputs = config["add_inputs"] || false;
     this.presetNum = config["preset_num"] || false;
     this.manualAddresses = config["manual_addresses"] || {};
     this.browser = mdns.createBrowser(mdns.tcp('http'), {
@@ -151,6 +152,8 @@ YamahaAVRPlatform.prototype = {
                                 // Only add zones control if more than 1 zone
                                 // Hack to always create a zone control
                                 // TODO: Remove if block
+                                this.log("Found %s zones, %s", zones.length, zones);
+
                                 if (zones.length > 0) {
                                     for (var zone in zones) {
                                         
@@ -193,7 +196,7 @@ YamahaAVRPlatform.prototype = {
                             }.bind(this));
                         }
 
-                        //if(this.setInputs) {
+                        //if(this.addInputs) {
                         yamaha.getAvailableInputs().then(function (inputs) {
                             console.log("Need INPUT!!!");
                             for (var inputs in input) {

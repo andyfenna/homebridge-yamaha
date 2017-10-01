@@ -167,6 +167,20 @@ YamahaAVRPlatform.prototype = {
                                                         this.log("Adding zone controller for", zoneName);
                                                         var accessory = new YamahaZone(this.log, this.config, zoneName, yamaha, sysConfig, z);
                                                         accessories.push(accessory);
+                                                            
+                                                        //if(this.addInputs) {
+                                                        yamaha.getAvailableInputs().then(function (inputs) {
+                                                            this.log("Need INPUT!!!");
+                                                            for (var inputs in input) {
+                                                                this.log("GOT INPUT %s", input);
+                                                                    this.log("Adding input %s - %s", input, inputs[input].value, this.inputNum);
+                                                                    // input by number
+                                                                    var accessory = new YamahaInput(this.log, this.config, input, yamaha, sysConfig);
+                                                                    accessories.push(accessory);
+                                                                };
+                                                            }.bind(this));
+                                                        //}
+
                                                     }.bind(this)
                                                 );
 
@@ -195,19 +209,6 @@ YamahaAVRPlatform.prototype = {
                                 };
                             }.bind(this));
                         }
-
-                        //if(this.addInputs) {
-                        yamaha.getAvailableInputs().then(function (inputs) {
-                            console.log("Need INPUT!!!");
-                            for (var inputs in input) {
-                                console.log("GOT INPUT %s", input);
-                                    this.log("Adding input %s - %s", input, inputs[input].value, this.inputNum);
-                                    // input by number
-                                    var accessory = new YamahaInput(this.log, this.config, input, yamaha, sysConfig);
-                                    accessories.push(accessory);
-                                };
-                            }.bind(this));
-                        //}
                     }
                     if (accessories.length >= this.expectedDevices)
                         timeoutFunction(); // We're done, call the timeout function now.
